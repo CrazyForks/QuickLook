@@ -24,7 +24,6 @@
         <DebugType>full</DebugType>
         <PlatformTarget>AnyCPU</PlatformTarget>
         <ErrorReport>prompt</ErrorReport>
-        <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     </PropertyGroup>
     
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -34,7 +33,6 @@
         <DebugType>pdbonly</DebugType>
         <PlatformTarget>AnyCPU</PlatformTarget>
         <ErrorReport>prompt</ErrorReport>
-        <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     </PropertyGroup>
 
     <ItemGroup>
@@ -46,6 +44,8 @@
             <SpecificVersion>False</SpecificVersion>
             <HintPath>Mediakit\Assemblies\DirectShowLib-2005.dll</HintPath>
         </Reference>
+        <PackageReference Include="UTF.Unknown" Version="2.5.1" />
+        <PackageReference Include="Melanchall.DryWetMidi" Version="7.2.0" />
     </ItemGroup>
 
     <ItemGroup>
