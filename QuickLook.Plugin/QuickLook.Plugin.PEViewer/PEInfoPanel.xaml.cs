@@ -29,14 +29,9 @@ namespace QuickLook.Plugin.PEViewer;
 
 public partial class PEInfoPanel : UserControl
 {
-    private bool _stop;
-
     public PEInfoPanel()
     {
         InitializeComponent();
-
-        // apply global theme
-        Resources.MergedDictionaries[0].Clear();
 
         string translationFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Translations.config");
         totalSizeTitle.Text = TranslationHelper.Get("TOTAL_SIZE", translationFile);
@@ -44,15 +39,9 @@ public partial class PEInfoPanel : UserControl
         productVersionTitle.Text = TranslationHelper.Get("PRODUCT_VERSION", translationFile);
     }
 
-    public bool Stop
-    {
-        set => _stop = value;
-        get => _stop;
-    }
-
     public void DisplayInfo(string path)
     {
-        Task.Run(() =>
+        _ = Task.Run(() =>
         {
             var scale = DisplayDeviceHelper.GetCurrentScaleFactor();
 
@@ -71,8 +60,6 @@ public partial class PEInfoPanel : UserControl
         var name = Path.GetFileName(path);
         filename.Text = string.IsNullOrEmpty(name) ? path : name;
 
-        Stop = false;
-
         _ = Task.Run(() =>
         {
             if (File.Exists(path))
@@ -83,13 +70,33 @@ public partial class PEInfoPanel : UserControl
 
                 try
                 {
-                    using var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
-                    using var binaryReader = new BinaryReader(stream);
-                    var byteArray = binaryReader.ReadBytes(1024); // Fast reading
-                    var peImage = PEImage.FromBinary(byteArray);
-                    var machine = peImage.CoffHeader.Machine;
+                    int maxAttempts = 3;
+                    int bufferSize = 1024;
 
-                    arch = machine.ToImageMachineName();
+                    for (int attempt = 0; attempt < maxAttempts; attempt++)
+                    {
+                        try
+                        {
+                            using var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
+                            using var binaryReader = new BinaryReader(stream);
+                            var byteArray = binaryReader.ReadBytes(bufferSize);
+                            var peImage = PEImage.FromBinary(byteArray);
+                            var machine = peImage.CoffHeader.Machine;
+
+                            arch = machine.ToImageMachineName();
+                            break; // Successfully parsed, jumped out of the loop
+                        }
+                        catch (Exception e) when (e.Message == "Section headers incomplete.")
+                        {
+                            // Extended buffer size
+                            bufferSize *= 2;
+                        }
+                        catch
+                        {
+                            // Non-Section headers errors will not be retryed
+                            break;
+                        }
+                    }
                 }
                 catch
                 {

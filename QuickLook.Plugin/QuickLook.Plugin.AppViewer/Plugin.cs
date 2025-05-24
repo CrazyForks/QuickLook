@@ -21,20 +21,37 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 
-namespace QuickLook.Plugin.PEViewer;
+namespace QuickLook.Plugin.AppViewer;
 
 public class Plugin : IViewer
 {
     private static readonly string[] _extensions =
     [
-        ".exe", ".sys", ".scr", ".ocx", ".cpl",  ".bpl",
-        ".dll", ".ax", ".drv", ".vxd",
-        ".mui", ".mun",
-        ".tlb",
-        ".efi", ".mz",
+        // Android
+        //".apk", ".apk.1", // Android Package
+        //".aar", // Android Archive
+        //".aab", // Android App Bundle
+
+        // Windows
+        //".appx", ".appxbundle", // Windows APPX installer
+        ".msi", // Windows MSI installer
+        //".msix", ".msixbundle", // Windows MSIX installer
+
+        // macOS
+        //".dmg", // macOS DMG
+
+        // iOS
+        //".ipa", // iOS IPA
+
+        // HarmonyOS
+        //".hap", // HarmonyOS Package
+        //".har", // HarmonyOS Archive
+
+        // Others
+        //".wgt", ".wgtu", // UniApp Widget
     ];
 
-    private PEInfoPanel _ip;
+    private IAppInfoPanel _ip;
     private string _path;
 
     public int Priority => 0;
@@ -50,13 +67,21 @@ public class Plugin : IViewer
 
     public void Prepare(string path, ContextObject context)
     {
-        context.PreferredSize = new Size { Width = 520, Height = 192 };
+        context.PreferredSize = Path.GetExtension(path) switch
+        {
+            ".msi" => new Size { Width = 520, Height = 230 },
+            _ => throw new NotSupportedException("Extension is not supported."),
+        };
     }
 
     public void View(string path, ContextObject context)
     {
         _path = path;
-        _ip = new PEInfoPanel();
+        _ip = Path.GetExtension(path) switch
+        {
+            ".msi" => new MsiInfoPanel(),
+            _ => throw new NotSupportedException("Extension is not supported."),
+        };
 
         _ip.DisplayInfo(_path);
         _ip.Tag = context;

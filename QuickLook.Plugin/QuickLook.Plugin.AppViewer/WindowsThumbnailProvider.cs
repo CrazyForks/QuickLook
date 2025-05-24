@@ -21,7 +21,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace QuickLook.Plugin.InfoPanel;
+namespace QuickLook.Plugin.AppViewer;
 
 [Flags]
 internal enum ThumbnailOptions
@@ -57,7 +57,7 @@ internal static class WindowsThumbnailProvider
         var hBitmap = GetHBitmap(Path.GetFullPath(fileName), width, height, options);
 
         if (hBitmap == IntPtr.Zero)
-            return null;
+            return null!;
 
         try
         {
@@ -143,9 +143,9 @@ internal static class WindowsThumbnailProvider
     internal interface IShellItem
     {
         public void BindToHandler(nint pbc,
-            [MarshalAs(UnmanagedType.LPStruct)] Guid bhid,
-            [MarshalAs(UnmanagedType.LPStruct)] Guid riid,
-            out nint ppv);
+           [MarshalAs(UnmanagedType.LPStruct)] Guid bhid,
+           [MarshalAs(UnmanagedType.LPStruct)] Guid riid,
+           out nint ppv);
 
         public void GetParent(out IShellItem ppsi);
 
@@ -165,7 +165,7 @@ internal static class WindowsThumbnailProvider
         PARENTRELATIVEEDITING = 0x80031001,
         DESKTOPABSOLUTEEDITING = 0x8004c000,
         FILESYSPATH = 0x80058000,
-        URL = 0x80068000
+        URL = 0x80068000,
     }
 
     internal enum HResult
@@ -182,7 +182,7 @@ internal static class WindowsThumbnailProvider
         Win32ErrorCanceled = 1223,
         Canceled = unchecked((int)0x800704C7),
         ResourceInUse = unchecked((int)0x800700AA),
-        AccessDenied = unchecked((int)0x80030005)
+        AccessDenied = unchecked((int)0x80030005),
     }
 
     [ComImport]
@@ -191,7 +191,7 @@ internal static class WindowsThumbnailProvider
     internal interface IShellItemImageFactory
     {
         [PreserveSig]
-        HResult GetImage(
+        public HResult GetImage(
             [In][MarshalAs(UnmanagedType.Struct)] NativeSize size,
             [In] ThumbnailOptions flags,
             [Out] out nint phbm);

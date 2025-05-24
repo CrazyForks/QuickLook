@@ -36,7 +36,7 @@ internal class ShareHelper
 
     internal static bool IsShareSupported(string path)
     {
-        return !Directory.Exists(path) && App.IsWin10 && Environment.OSVersion.Version >= new Version("10.0.16299.0");
+        return !Directory.Exists(path) && Environment.OSVersion.Version >= new Version(10, 0, 16299);
     }
 
     internal static void Share(string path, Window parent, bool forceOpenWith = false)
@@ -109,12 +109,12 @@ internal static class DataTransferManagerHelper
     private static IDataTransferManagerInterop DataTransferManagerInterop =>
         (IDataTransferManagerInterop)WindowsRuntimeMarshal.GetActivationFactory(typeof(DataTransferManager));
 
-    public static DataTransferManager GetForWindow(IntPtr hwnd)
+    public static DataTransferManager GetForWindow(nint hwnd)
     {
         return DataTransferManagerInterop.GetForWindow(hwnd, DTM_IID);
     }
 
-    public static void ShowShareUIForWindow(IntPtr hwnd)
+    public static void ShowShareUIForWindow(nint hwnd)
     {
         DataTransferManagerInterop.ShowShareUIForWindow(hwnd);
     }
@@ -124,8 +124,8 @@ internal static class DataTransferManagerHelper
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     private interface IDataTransferManagerInterop
     {
-        DataTransferManager GetForWindow([In] IntPtr appWindow, [In] ref Guid riid);
+        public DataTransferManager GetForWindow([In] nint appWindow, [In] ref Guid riid);
 
-        void ShowShareUIForWindow(IntPtr appWindow);
+        public void ShowShareUIForWindow(nint appWindow);
     }
 }

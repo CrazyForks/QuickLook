@@ -15,32 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using PureSharpCompress.Common;
-using PureSharpCompress.Readers;
-using System;
-using System.Text;
-using UtfUnknown;
+namespace QuickLook.Plugin.AppViewer.MsiImageParser;
 
-namespace QuickLook.Plugin.ArchiveViewer;
-
-internal class ChardetReaderOptions : ReaderOptions
+public sealed class MsiInfo
 {
-    public ChardetReaderOptions()
-    {
-        ArchiveEncoding = new ArchiveEncoding
-        {
-            CustomDecoder = Chardet
-        };
-    }
+    public string ProductVersion { get; set; }
 
-    public string Chardet(byte[] bytes, int index, int count)
-    {
-        var buffer = new byte[count];
+    public string ProductName { get; set; }
 
-        Array.Copy(bytes, index, buffer, 0, count);
+    public string Manufacturer { get; set; }
 
-        var encoding = CharsetDetector.DetectFromBytes(buffer).Detected?.Encoding ?? Encoding.Default;
+    public string ProductCode { get; set; }
 
-        return encoding.GetString(buffer);
-    }
+    public string UpgradeCode { get; set; }
 }

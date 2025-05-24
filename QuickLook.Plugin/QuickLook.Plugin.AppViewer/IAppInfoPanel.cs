@@ -15,32 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using PureSharpCompress.Common;
-using PureSharpCompress.Readers;
-using System;
-using System.Text;
-using UtfUnknown;
+namespace QuickLook.Plugin.AppViewer;
 
-namespace QuickLook.Plugin.ArchiveViewer;
-
-internal class ChardetReaderOptions : ReaderOptions
+public interface IAppInfoPanel
 {
-    public ChardetReaderOptions()
-    {
-        ArchiveEncoding = new ArchiveEncoding
-        {
-            CustomDecoder = Chardet
-        };
-    }
+    public void DisplayInfo(string path);
 
-    public string Chardet(byte[] bytes, int index, int count)
-    {
-        var buffer = new byte[count];
+    public object Tag { get; set; }
 
-        Array.Copy(bytes, index, buffer, 0, count);
-
-        var encoding = CharsetDetector.DetectFromBytes(buffer).Detected?.Encoding ?? Encoding.Default;
-
-        return encoding.GetString(buffer);
-    }
+    public bool Stop { get; set; }
 }
